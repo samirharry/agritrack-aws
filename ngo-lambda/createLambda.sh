@@ -19,6 +19,7 @@ echo Copy the Managed Blockchain TLS Certificate
 cp ~/managedblockchain-tls-chain.pem ./src/certs/managedblockchain-tls-chain.pem
 
 echo Generate the Fabric connection profile
+chmod u+x ./gen-connection-profile.sh
 ./gen-connection-profile.sh
 sed -i "s|/home/ec2-user/managedblockchain-tls-chain.pem|./certs/managedblockchain-tls-chain.pem|g" ./src/connection-profile.yaml
 
