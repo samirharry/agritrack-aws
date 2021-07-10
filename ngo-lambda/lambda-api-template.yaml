@@ -94,24 +94,36 @@ Resources:
         SubnetIds:
           - !Ref SUBNETID
       Events:
-        GetDonors:
+        GetProducts:
           Type: Api
           Properties:
-            Path: /donors
+            Path: /products
             Method: get
             RestApiId: !Ref NGOAPIGateway
-        CreateDonor:
+        CreateProduct:
           Type: Api
           Properties:
-            Path: /donors
+            Path: /products
             Method: post
             RestApiId: !Ref NGOAPIGateway
-        GetDonor:
+        CreateTrack:
           Type: Api
           Properties:
-            Path: /donors/{donorUserName}
+            Path: /tracks
+            Method: post
+            RestApiId: !Ref NGOAPIGateway
+        GetTrack:
+          Type: Api
+          Properties:
+            Path: /tracks
             Method: get
             RestApiId: !Ref NGOAPIGateway
+        GetProduct:
+          Type: Api
+          Properties:
+            Path: /products/{Id}
+            Method: get
+            RestApiId: !Ref NGOAPIGateway            
   SecretsManagerVPCE:
     Type: 'AWS::EC2::VPCEndpoint'
     Properties:
@@ -132,9 +144,9 @@ Resources:
         swagger: "2.0"
         info:
           version: "2019-11-13T11:12:00Z"
-          title: "Non Profit Blockchain"
+          title: "Agritrack Blockchain"
         paths:
-          /donors:
+          /products:
             get:
               consumes:
               - "application/json"
@@ -153,7 +165,7 @@ Resources:
                     statusCode: "200"
                 requestTemplates:
                   application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
-                    : \"queryAllDonors\",\n  \"chaincodeFunctionArgs\": {},\n  \"fabricUsername\"\
+                    : \"queryAllProducts\",\n  \"chaincodeFunctionArgs\": {},\n  \"fabricUsername\"\
                     : \"lambdaUser\"\n}"
                 passthroughBehavior: "when_no_templates"
                 httpMethod: "POST"
@@ -177,22 +189,22 @@ Resources:
                     statusCode: "200"
                 requestTemplates:
                   application/json: "{\n  \"functionType\": \"invoke\",\n  \"chaincodeFunction\"\
-                    : \"createDonor\",\n  \"chaincodeFunctionArgs\": {\n      #set( $body\
-                    \ = $util.parseJson($input.body) )\n      \"donorUserName\": \"$body.donorUserName\"\
-                    ,\n      \"email\": \"$body.email\",\n      \"registeredDate\":\"$context.requestTime\"\
+                    : \"createProduct\",\n  \"chaincodeFunctionArgs\": {\n      #set( $body\
+                    \ = $util.parseJson($input.body) )\n      \"id\": \"$body.id\"\
+                    ,\n      \"title\": \"$body.title\",\n      \"price\": \"$body.price\",\n      \"producer\": \"$body.producer\",\n      \"registeredDate\":\"$context.requestTime\"\
                     \n  },\n  \"fabricUsername\": \"lambdaUser\"\n}"
                 passthroughBehavior: "when_no_templates"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
                 type: "aws"
-          /donors/{donorUserName}:
+          /product/{id}:
             get:
               consumes:
               - "application/json"
               produces:
               - "application/json"
               parameters:
-              - name: "donorUserName"
+              - name: "Id"
                 in: "path"
                 required: true
                 type: "string"
@@ -209,9 +221,60 @@ Resources:
                     statusCode: "200"
                 requestTemplates:
                   application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
-                    : \"queryDonor\",\n  \"chaincodeFunctionArgs\": {\n      \"donorUserName\"\
-                    : \"$input.params('donorUserName')\"\n  },\n  \"fabricUsername\": \"lambdaUser\"\
+                    : \"queryProduct\",\n  \"chaincodeFunctionArgs\": {\n      \"Id\"\
+                    : \"$input.params('Id')\"\n  },\n  \"fabricUsername\": \"lambdaUser\"\
                     \n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+          /tracks:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"queryObject\",\n  \"chaincodeFunction\"\
+                    : \"queryAllTracks\",\n  \"chaincodeFunctionArgs\": {},\n  \"fabricUsername\"\
+                    : \"lambdaUser\"\n}"
+                passthroughBehavior: "when_no_templates"
+                httpMethod: "POST"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+            post:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${NGOLambdaFunction.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                requestTemplates:
+                  application/json: "{\n  \"functionType\": \"invoke\",\n  \"chaincodeFunction\"\
+                    : \"createTrack\",\n  \"chaincodeFunctionArgs\": {\n      #set( $body\
+                    \ = $util.parseJson($input.body) )\n      \"Id\": \"$body.Id\"\
+                    ,\n      \"productId\": \"$body.productId\",\n      \"ubication\": \"$body.ubication\",\n      \"registeredDate\":\"$context.requestTime\"\
+                    \n  },\n  \"fabricUsername\": \"lambdaUser\"\n}"
                 passthroughBehavior: "when_no_templates"
                 httpMethod: "POST"
                 contentHandling: "CONVERT_TO_TEXT"
