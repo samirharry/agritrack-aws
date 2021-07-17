@@ -594,10 +594,10 @@ let Chaincode = class {
    * @param {*} stub 
    * @param {*} args 
    */
-  async queryAllDonations(stub, args) {
+  async queryAllTracks(stub, args) {
     console.log('============= START : queryAllDonations ===========');
     console.log('##### queryAllDonations arguments: ' + JSON.stringify(args)); 
-    let queryString = '{"selector": {"docType": "donation"}}';
+    let queryString = '{"selector": {"docType": "track"}}';
     return queryByString(stub, queryString);
   }
 
