@@ -474,11 +474,6 @@ let Chaincode = class {
 
     console.log('##### createProduct payload: ' + JSON.stringify(json));
 
-    // Check if the donor already exists
-    let donorQuery = await stub.getState(key);
-    if (donorQuery.toString()) {
-      throw new Error('##### createProduct - This product already exists: ' + json['Id']);
-    }
 
     await stub.putState(key, Buffer.from(JSON.stringify(json)));
     console.log('============= END : createDonor ===========');
@@ -554,11 +549,6 @@ let Chaincode = class {
       throw new Error('##### createDonation - Cannot create donation as the NGO does not exist: ' + json['productId']);
     }
 
-    // Check if the Donation already exists
-    let donationQuery = await stub.getState(key);
-    if (donationQuery.toString()) {
-      throw new Error('##### createDonation - This Donation already exists: ' + json['Id']);
-    }
 
     await stub.putState(key, Buffer.from(JSON.stringify(json)));
     console.log('============= END : createDonation ===========');
