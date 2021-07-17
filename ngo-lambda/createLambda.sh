@@ -44,7 +44,7 @@ aws cloudformation package --template-file lambda-api-template.yaml \
 
 echo Deploy the Lambda Cloudformation stack
 export CHAINCODEID=ngo
-export LAMBDA_STACK_NAME=fabric-lambda-stack
+export LAMBDA_STACK_NAME=agritrack-lambda-stack
 export VPC_STACK_NAME=$NETWORKNAME-fabric-client-node
 export VPCID=$(aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='VPCID'].OutputValue" --output text --region $REGION)
 
